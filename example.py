@@ -3,7 +3,7 @@
 from intelLib.models import GAT, ALSTM, GRU
 from intelLib.run import task
 
-path = 'intelLib\\data\\netflix.csv'
+path = 'intelLib\\datasets\\netflix.csv'
 
 # define the model
 # model parameters
