@@ -3,7 +3,7 @@
 from intelLib.models import GAT, ALSTM, GRU,LSTM
 from intelLib.run import task
 
-path = 'C:\\workspace\\StocksAI\\PredictorModels\\datasets\\netflix.csv'
+path = 'intelLib\\datasets\\netflix.csv'
 
 # define the model
 # model parameters
