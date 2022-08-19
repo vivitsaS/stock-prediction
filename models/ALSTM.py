@@ -3,7 +3,6 @@
 from __future__ import division
 from __future__ import print_function
 
-import torch
 import torch.nn as nn
 
 import copy
@@ -40,6 +39,7 @@ class Task:
 
         """self.pred = pred
         self.pred_true = pred_true"""
+        print("n_epochs = ", n_epochs)
 
     def mse(self, pred, label):
         loss = ((pred - label) ** 2)
@@ -91,7 +91,7 @@ class Task:
             loss = self.loss_fn(pred, label)
             losses.append(loss.item())
 
-            score = (1 - self.metric_fn(pred, label))
+            score = (self.metric_fn(pred, label))
             scores.append(score.item())
 
             # to obtain true values for comparison plot
@@ -126,6 +126,7 @@ class Task:
         for step in range(self.n_epochs):
             # didn't use test set!
             print("epoch number = ", step)
+
             self.train_epoch()
 
             train_loss, train_score, y_pred_train = self.test_epoch(self.X_train, self.y_train, self.X_train_true,
@@ -136,17 +137,32 @@ class Task:
             evals_loss_val.append(val_loss)
             evals_result_train.append(train_score)
             evals_result_val.append(val_score)
+            best_param = copy.deepcopy(self.model.state_dict())
 
-            for val_score in evals_result_val:
-                if val_score > best_score:
-                    best_score = val_score
-                    stop_steps = 0
-                    best_epoch = step
-                    best_param = copy.deepcopy(self.model.state_dict())
-                else:
-                    stop_steps += 1
-                    if stop_steps >= self.early_stop:
-                        break
+            """print("train loss = ", val_loss)
+            print("validation loss = ", train_loss)"""
+
+            # early stop
+            # early stop doesn't mean the max step until which we tolerate bad results.
+            # It means the number of times we tolerate bad results in a row.
+            diff_loss = val_loss - train_loss
+            """print("diff_loss = ",diff_loss)"""
+            # print("evals_loss_train[step - 1] - evals_loss_val[step - 1]) = ", evals_loss_train[step - 1] - evals_loss_val[step - 1])
+            # if for the past 7 epochs, the diff loss keeps increasing it means that it is now overfitting.
+            # best parameters are the ones for which the diff loss was the lowest in the past 8 epochs.
+
+            if (diff_loss < .05) and (
+                    diff_loss < (evals_loss_val[step - 1] - evals_loss_train[step - 1])):
+
+                #print("Val loss = ", val_loss)
+                best_score = 1 - val_loss
+                stop_steps = 0
+                best_epoch = step
+                best_param = copy.deepcopy(self.model.state_dict())
+            else:
+                stop_steps += 1
+                if stop_steps >= self.early_stop:
+                    break
 
         print("best score={}".format(best_score))
         print("best epoch={}".format(best_epoch))
