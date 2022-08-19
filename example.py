@@ -20,7 +20,7 @@ loss_type = "mse"
 metric_type = ""
 n_epochs = 300
 lr = 0.002
-early_stop = 20
+early_stop = 40
 
 # fit model to dataset from path
 print("\n fitting...")
