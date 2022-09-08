@@ -108,8 +108,8 @@ class Task:
 
             model = self.train_epoch()
 
-            train_loss, train_score = self.test_epoch(X_train, y_train)
-            val_loss, val_score = self.test_epoch(X_val, y_val)
+            train_loss, train_score = self.test_epoch(self.X_train,self.y_train)
+            val_loss, val_score = self.test_epoch(self.X_val, self.y_val)
 
             evals_loss_train.append(train_loss)
             evals_loss_val.append(val_loss)
